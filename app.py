@@ -8,7 +8,6 @@ from diffusers import (
     StableDiffusionXLControlNetImg2ImgPipeline,
     DDIMScheduler,
 )
-from controlnet_aux import AnylineDetector
 from compel import Compel, ReturnedEmbeddingsType
 from PIL import Image
 import os
@@ -146,16 +145,7 @@ class Img2Img:
 
             with gr.Column():
                 output_image = gr.Image(type="pil", label="Output Image")
-
-            # インプットとアウトプットの設定
-            inputs = [
-                self.input_image_path,
-                prompt,
-                nega,
-                controlnet_conditioning_scale,
-            ]
-            outputs = [output_image]
-            
+          
             # ボタンのクリックイベントを設定
             generate_button.click(
                 fn=self.predict,
