@@ -36,10 +36,9 @@ def load_model(lora_dir, cn_dir):
     pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
         "cagliostrolab/animagine-xl-3.1", controlnet=controlnet, vae=vae, torch_dtype=torch.float16
     )
+    pipe.enable_model_cpu_offload()
     pipe.load_lora_weights(lora_dir, weight_name="normalmap.safetensors")
-    pipe.set_adapters(["normalmap"], adapter_weights=[1.4])
-    pipe.fuse_lora()
-    pipe = pipe.to(device)
+    # pipe = pipe.to(device)
     return pipe
 
 
@@ -48,7 +47,8 @@ def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
     pipe = load_model(lora_dir, cn_dir) 
     input_image = Image.open(input_image_path)
     base_image = base_generation(input_image.size, (150, 110, 255, 255)).convert("RGB")
-    resize_image = resize_image_aspect_ratio(base_image)
+    resize_image = resize_image_aspect_ratio(input_image)
+    resize_base_image = resize_image_aspect_ratio(base_image)
     generator = torch.manual_seed(0)
     last_time = time.time()
     prompt = "masterpiece, best quality, normal map, purple background, " + prompt
@@ -59,7 +59,7 @@ def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
     print(prompt)
 
     output_image = pipe(
-        image=resize_image,
+        image=resize_base_image,
         control_image=resize_image,
         strength=1.0,
         prompt=prompt,
