@@ -86,8 +86,8 @@ class Img2Img:
 
     def process_prompt_analysis(self, input_image_path):
         if self.tagger_model is None:
-            self.tagger_model = modelLoad(self.tagger_dir)
-        tags = analysis(input_image_path, self.tagger_dir, self.tagger_model)
+            self.tagger_model = modelLoad(tagger_dir)
+        tags = analysis(input_image_path, tagger_dir, self.tagger_model)
         tags_list = tags      
         if self.post_filter:
             tags_list = remove_color(tags)
