@@ -1,7 +1,7 @@
 import spaces
 import gradio as gr
 import torch
-from diffusers import ControlNetModel, StableDiffusionXLControlNetImg2ImgPipeline, DDIMScheduler
+from diffusers import ControlNetModel, StableDiffusionXLControlNetImg2ImgPipeline, ControlNetModel, AutoencoderKL
 from PIL import Image
 import os
 import time
@@ -29,7 +29,7 @@ def load_model(lora_dir, cn_dir):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     dtype = torch.float16
     model = "cagliostrolab/animagine-xl-3.1"
-    scheduler = DDIMScheduler.from_pretrained(model, subfolder="scheduler")
+    scheduler = AutoencoderKL.from_pretrained(model, subfolder="scheduler")
     controlnet = ControlNetModel.from_pretrained(cn_dir, torch_dtype=dtype, use_safetensors=True)
     pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
         model,
@@ -65,9 +65,9 @@ def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
         strength=1.0,
         prompt=prompt,
         negative_prompt = negative_prompt,
-        controlnet_conditioning_scale=[float(controlnet_scale)],
+        controlnet_conditioning_scale=float(controlnet_scale),
         generator=generator,
-        num_inference_steps=50,
+        num_inference_steps=30,
         eta=1.0,
     ).images[0]
     print(f"Time taken: {time.time() - last_time}")
