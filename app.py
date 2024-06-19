@@ -7,7 +7,7 @@ import os
 import time
 
 from utils.utils import load_cn_model, load_cn_config, load_tagger_model, load_lora_model, resize_image_aspect_ratio, base_generation
-from utils.prompt_utils import remove_color
+from utils.prompt_utils import execute_prompt, remove_color, remove_duplicates
 from utils.tagger import modelLoad, analysis
 
 
@@ -54,6 +54,11 @@ def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
     white_base_pil = base_generation(resize_image.size, (255, 255, 255, 255)).convert("RGB")
     generator = torch.manual_seed(0)
     last_time = time.time()
+    prompt = "masterpiece, best quality, monochrome, lineart, white background, " + prompt
+    execute_tags = ["sketch", "transparent background"]
+    prompt = execute_prompt(execute_tags, prompt)
+    prompt = remove_duplicates(prompt)        
+    prompt = remove_color(prompt)
 
     output_image = pipe(
         image=white_base_pil,
