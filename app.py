@@ -28,7 +28,6 @@ dl_tagger_model(tagger_dir)
 dl_lora_model(lora_dir)
 
 def load_model(lora_dir, cn_dir):
-    device = "cuda" if torch.cuda.is_available() else "cpu"
     dtype = torch.float16
     vae = AutoencoderKL.from_pretrained("madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16)
     controlnet = ControlNetModel.from_pretrained(cn_dir, torch_dtype=dtype, use_safetensors=True)
@@ -37,22 +36,20 @@ def load_model(lora_dir, cn_dir):
         "cagliostrolab/animagine-xl-3.1", controlnet=controlnet, vae=vae, torch_dtype=torch.float16
     )
     pipe.enable_model_cpu_offload()
-    pipe.load_lora_weights(lora_dir, weight_name="normalmap.safetensors")
-    # pipe = pipe.to(device)
+    pipe.load_lora_weights(lora_dir, weight_name="lineart.safetensors")
     return pipe
-
 
 @spaces.GPU
 def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
     pipe = load_model(lora_dir, cn_dir) 
     input_image = Image.open(input_image_path)
-    base_image = base_generation(input_image.size, (150, 110, 255, 255)).convert("RGB")
+    base_image = base_generation(input_image.size, (255, 255, 255, 255)).convert("RGB")
     resize_image = resize_image_aspect_ratio(input_image)
     resize_base_image = resize_image_aspect_ratio(base_image)
     generator = torch.manual_seed(0)
     last_time = time.time()
-    prompt = "masterpiece, best quality, normal map, purple background, " + prompt
-    execute_tags = ["monochrome", "greyscale", "lineart", "white background", "sketch", "transparent background"]
+    prompt = "masterpiece, best quality, monochrome, greyscale, lineart, white background, " + prompt
+    execute_tags = ["sketch", "transparent background"]
     prompt = execute_prompt(execute_tags, prompt)
     prompt = remove_duplicates(prompt)        
     prompt = remove_color(prompt)
@@ -73,12 +70,9 @@ def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
     output_image = output_image.resize(input_image.size, Image.LANCZOS)
     return output_image
 
-
-
 class Img2Img:
     def __init__(self):
         self.demo = self.layout()
-        self.post_filter = True
         self.tagger_model = None
         self.input_image_path = None
         self.canny_image = None
@@ -88,11 +82,8 @@ class Img2Img:
         if self.tagger_model is None:
             self.tagger_model = modelLoad(tagger_dir)
         tags = analysis(input_image_path, tagger_dir, self.tagger_model)
-        tags_list = tags      
-        if self.post_filter:
-            tags_list = remove_color(tags)
+        tags_list = remove_color(tags)
         return tags_list
-
 
 
     def layout(self):
@@ -127,7 +118,6 @@ class Img2Img:
                 outputs=self.output_image
             )
         return demo
-
 
 img2img = Img2Img()
 img2img.demo.launch(share=True)
