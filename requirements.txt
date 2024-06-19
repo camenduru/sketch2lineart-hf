@@ -22,3 +22,4 @@ controlnet-aux==0.0.9
 onnx==1.16.1
 onnxruntime==1.18.0
 mediapipe==0.10.14
+peft==0.11.1
