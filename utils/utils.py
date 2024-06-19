@@ -62,8 +62,8 @@ def load_tagger_model(model_dir):
 
 def load_lora_model(model_dir):
   folder = model_dir
-  file_name = 'style-lineart_02.safetensors'
-  url = "https://huggingface.co/2vXpSwA7/iroiro-lora/resolve/main/test3/style-lineart_02.safetensors"
+  file_name = 'sdxl_BWLine.safetensors'
+  url = "https://huggingface.co/tori29umai/lineart/resolve/main/sdxl_BWLine.safetensors"
 
   file_path = os.path.join(folder, file_name)
   if not os.path.exists(file_path):
