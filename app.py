@@ -33,7 +33,6 @@ class Img2Img:
     def __init__(self):
         self.setup_paths()
         self.setup_models()
-        self.demo = self.layout()
         self.post_filter = True
         self.tagger_model = None
         self.input_image_path = None
@@ -64,7 +63,7 @@ class Img2Img:
         return tags_list
 
 
-    def layout(self):
+    def launch(self):
         css = """
         #intro{
             max-width: 32rem;
@@ -97,13 +96,11 @@ class Img2Img:
                 inputs=[self.input_image_path, self.prompt, self.negative_prompt, self.controlnet_scale],
                 outputs=self.output_image
             )
-
         self.demo.queue()
         self.demo.launch(share=True)
 
     @spaces.GPU
     def predict(self, input_image_path, prompt, negative_prompt, controlnet_scale):
-        # モデルのロードをここに移動
         pipe = load_model(self.lora_dir, self.cn_dir)
         input_image_pil = Image.open(input_image_path)
         base_size = input_image_pil.size
@@ -133,3 +130,7 @@ class Img2Img:
         print(f"Time taken: {time.time() - last_time}")
         output_image = output_image.resize(base_size, Image.LANCZOS)
         return output_image
+
+if __name__ == "__main__":
+    ui = Img2Img()
+    ui.launch(share=False)
