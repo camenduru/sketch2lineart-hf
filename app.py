@@ -7,7 +7,7 @@ import os
 import time
 
 from utils.dl_utils import dl_cn_model, dl_cn_config, dl_tagger_model, dl_lora_model
-from utils.image_utils import resize_image_aspect_ratio, base_generation, canny_process
+from utils.image_utils import resize_image_aspect_ratio, base_generation, line_process
 
 from utils.prompt_utils import execute_prompt, remove_color, remove_duplicates
 from utils.tagger import modelLoad, analysis
@@ -32,6 +32,7 @@ def load_model(lora_dir, cn_dir):
     dtype = torch.float16
     vae = AutoencoderKL.from_pretrained("madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16)
     controlnet = ControlNetModel.from_pretrained(cn_dir, torch_dtype=dtype, use_safetensors=True)
+
     pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
         "cagliostrolab/animagine-xl-3.1", controlnet=controlnet, vae=vae, torch_dtype=torch.float16
     )
@@ -94,10 +95,10 @@ class Img2Img:
             tags_list = remove_color(tags)
         return tags_list
 
-    def _make_canny(self, img_path, canny_threshold1, canny_threshold2):
-        threshold1 = int(canny_threshold1)
-        threshold2 = int(canny_threshold2)
-        return canny_process(img_path, threshold1, threshold2)
+    def _make_line(self, img_path, sigma, gamma):
+        sigma = float(sigma )
+        gamma = float(gamma)
+        return line_process(img_path, sigma, gamma)
 
     def layout(self):
         css = """
@@ -113,9 +114,8 @@ class Img2Img:
                     self.input_image_path = gr.Image(label="input_image", type='filepath')
                     self.canny_image = gr.Image(label="canny_image", type='pil')
                     with gr.Row():
-                        canny_threshold1 = gr.Slider(minimum=0, value=20, maximum=253, show_label=False)
-                        gr.HTML(value="<span>/</span>", show_label=False)
-                        canny_threshold2 = gr.Slider(minimum=0, value=120, maximum=254, show_label=False)
+                        line_sigma = gr.Slider(minimum=0.1, value=1.4, maximum=3.0, show_label=False)
+                        line_gamma = gr.Slider(minimum=0.5, value=0.98, maximum=2.0, show_label=False)
                         canny_generate_button = gr.Button("canny_generate")
 
                     self.prompt = gr.Textbox(label="prompt", lines=3)
@@ -130,8 +130,8 @@ class Img2Img:
                     self.output_image = gr.Image(type="pil", label="output_image")
 
             canny_generate_button.click(
-                        self._make_canny,
-                        inputs=[self.input_image_path, canny_threshold1, canny_threshold2],
+                        self._make_line,
+                        inputs=[self.input_image_path, line_sigma, line_gamma],
                         outputs=self.canny_image
             )
 
