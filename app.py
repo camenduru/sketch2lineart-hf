@@ -54,7 +54,7 @@ def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
     pipe = load_model(lora_dir, cn_dir) 
     line_image =make_line(input_image_path, 1.4, 0.98)
     base_size = line_image.size
-    resize_image = resize_image_aspect_ratio(resize_image)
+    resize_image = resize_image_aspect_ratio(line_image)
     generator = torch.manual_seed(0)
     last_time = time.time()
     prompt = "masterpiece, best quality, monochrome, lineart, white background, " + prompt
