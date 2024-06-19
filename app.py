@@ -49,8 +49,6 @@ def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
     input_image_pil = Image.open(input_image_path)
     base_size = input_image_pil.size
     resize_image = resize_image_aspect_ratio(input_image_pil)
-    resize_image_size = resize_image.size
-    width, height = resize_image_size
     white_base_pil = base_generation(resize_image.size, (255, 255, 255, 255)).convert("RGB")
     generator = torch.manual_seed(0)
     last_time = time.time()
@@ -67,14 +65,9 @@ def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
         strength=1.0,
         prompt=prompt,
         negative_prompt = negative_prompt,
-        width=width,
-        height=height,
-        controlnet_conditioning_scale=float(controlnet_scale),
-        controlnet_start=0.0,
-        controlnet_end=1.0,
+        controlnet_conditioning_scale=[float(controlnet_scale)],
         generator=generator,
-        num_inference_steps=30,
-        guidance_scale=8.5,
+        num_inference_steps=50,
         eta=1.0,
     ).images[0]
     print(f"Time taken: {time.time() - last_time}")
