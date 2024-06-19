@@ -125,7 +125,7 @@ class Img2Img:
         # margin: 0 auto;
     }
     """
-    def layout(self):
+    def layout(self,css):
         with gr.Blocks(css=css) as demo:
             with gr.Row() as block:
                 with gr.Column():
