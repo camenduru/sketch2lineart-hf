@@ -46,6 +46,12 @@ class Img2Img:
         os.makedirs(self.tagger_dir, exist_ok=True)
         os.makedirs(self.lora_dir, exist_ok=True)
 
+    def setup_models(self):
+        load_cn_model(self.cn_dir)
+        load_cn_config(self.cn_dir)
+        load_tagger_model(self.tagger_dir)
+        load_lora_model(self.lora_dir)
+
     def layout(self):
         css = """
         #intro{
