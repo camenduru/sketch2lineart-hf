@@ -132,7 +132,7 @@ with gr.Blocks(css=css) as demo:
             # プロンプト入力用の行
             with gr.Row():
                 prompt_analysis = PromptAnalysis(tagger_dir)
-                [prompt, nega] = PromptAnalysis.layout(input_image_path)           
+                [prompt, nega] = prompt_analysis.layout(input_image_path)           
             # 画像の詳細設定用のスライダー行
             with gr.Row():
                 controlnet_conditioning_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, interactive=True, label="線画忠実度")
