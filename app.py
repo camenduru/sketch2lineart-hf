@@ -37,6 +37,7 @@ class Img2Img:
         self.default_nagative_prompt = "lowres, error, extra digit, fewer digits, cropped, worst quality,low quality, normal quality, jpeg artifacts, blurry"
         self.post_filter = True
         self.tagger_model = None
+        self.input_image_path = None
 
     def setup_paths(self):
         self.path = os.getcwd()
@@ -54,7 +55,7 @@ class Img2Img:
         load_lora_model(self.lora_dir)
 
 
-    def prompt_layout(self, input_image_path):
+    def prompt_layout(self):
         with gr.Column():
             with gr.Row():
                 self.prompt = gr.Textbox(label="prompt", lines=3)
@@ -65,7 +66,7 @@ class Img2Img:
 
         self.prompt_analysis_button.click(
             self.process_prompt_analysis,
-            inputs=[input_image_path],
+            inputs=[self.input_image_path],
             outputs=self.prompt
         )
         return [self.prompt, self.negative_prompt]
