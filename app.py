@@ -35,9 +35,8 @@ class Img2Img:
         self.setup_models()
         self.demo = self.layout()
         self.post_filter = True
-        self.tagger_model = None
         self.input_image_path = None
-        self.tagger_model = None
+
 
     def setup_paths(self):
         self.path = os.getcwd()
@@ -53,11 +52,10 @@ class Img2Img:
         load_cn_config(self.cn_dir)
         load_tagger_model(self.tagger_dir)
         load_lora_model(self.lora_dir)
+        self.tagger_model = modelLoad(self.tagger_dir)
 
     @staticmethod
-    def process_prompt_analysis(input_image_path,tagger_model,tagger_dir,post_filter):
-        if tagger_model is None:
-            tagger_model = modelLoad(tagger_dir)
+    def process_prompt_analysis(input_image_path,tagger_model,tagger_dir,post_filter):           
         tags = analysis(input_image_path, tagger_dir, tagger_model)
         tags_list = tags      
         if post_filter:
@@ -88,7 +86,7 @@ class Img2Img:
 
             prompt_analysis_button.click(
                         self.process_prompt_analysis,
-                        inputs=[self.input_image_path,self.tagger_model,self.tagger_dir,self.post_filter],
+                        inputs=[self.input_image_path, self.tagger_model, self.tagger_dir, self.post_filter],
                         outputs=self.prompt
             )
 
