@@ -7,7 +7,7 @@ import os
 import time
 
 from utils.dl_utils import dl_cn_model, dl_cn_config, dl_tagger_model, dl_lora_model
-from utils.image_utils import resize_image_aspect_ratio, base_generation
+from utils.image_utils import resize_image_aspect_ratio, base_generation, canny_process
 
 from utils.prompt_utils import execute_prompt, remove_color, remove_duplicates
 from utils.tagger import modelLoad, analysis
@@ -22,8 +22,8 @@ os.makedirs(cn_dir, exist_ok=True)
 os.makedirs(tagger_dir, exist_ok=True)
 os.makedirs(lora_dir, exist_ok=True)
 
-dl_cn_model(cn_dir)
-dl_cn_config(cn_dir)
+# dl_cn_model(cn_dir)
+# dl_cn_config(cn_dir)
 dl_tagger_model(tagger_dir)
 dl_lora_model(lora_dir)
 
@@ -31,7 +31,11 @@ def load_model(lora_dir, cn_dir):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     dtype = torch.float16
     vae = AutoencoderKL.from_pretrained("madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16)
-    controlnet = ControlNetModel.from_pretrained(cn_dir, torch_dtype=dtype, use_safetensors=True)
+    # controlnet = ControlNetModel.from_pretrained(cn_dir, torch_dtype=dtype, use_safetensors=True)
+    controlnet = ControlNetModel.from_pretrained(
+        "diffusers/controlnet-canny-sdxl-1.0",
+        torch_dtype=torch.float16
+    )
     pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
         "cagliostrolab/animagine-xl-3.1", controlnet=controlnet, vae=vae, torch_dtype=torch.float16
     )
@@ -43,12 +47,13 @@ def load_model(lora_dir, cn_dir):
 
 
 @spaces.GPU
-def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
+def predict(input_image_path, canny_image, prompt, negative_prompt, controlnet_scale):
     pipe = load_model(lora_dir, cn_dir) 
     input_image_pil = Image.open(input_image_path)
     base_size = input_image_pil.size
     resize_image = resize_image_aspect_ratio(input_image_pil)
     white_base_pil = base_generation(resize_image.size, (255, 255, 255, 255)).convert("RGB")
+    canny_image = canny_image.resize(resize_image.size, Image.LANCZOS)
     generator = torch.manual_seed(0)
     last_time = time.time()
     prompt = "masterpiece, best quality, monochrome, lineart, white background, " + prompt
@@ -60,7 +65,7 @@ def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
 
     output_image = pipe(
         image=white_base_pil,
-        control_image=resize_image,
+        control_image=canny_image,
         strength=1.0,
         prompt=prompt,
         negative_prompt = negative_prompt,
@@ -81,6 +86,8 @@ class Img2Img:
         self.post_filter = True
         self.tagger_model = None
         self.input_image_path = None
+        self.canny_image = None
+
 
     def process_prompt_analysis(self, input_image_path):
         if self.tagger_model is None:
@@ -91,6 +98,10 @@ class Img2Img:
             tags_list = remove_color(tags)
         return tags_list
 
+    def _make_canny(self, img_path, canny_threshold1, canny_threshold2):
+        threshold1 = int(canny_threshold1)
+        threshold2 = int(canny_threshold2)
+        return canny_process(img_path, threshold1, threshold2)
 
     def layout(self):
         css = """
@@ -104,6 +115,13 @@ class Img2Img:
             with gr.Row():
                 with gr.Column():
                     self.input_image_path = gr.Image(label="input_image", type='filepath')
+                    self.canny_image = gr.Image(label="canny_image", type='pil')
+                    with gr.Row():
+                        canny_threshold1 = gr.Slider(minimum=0, value=20, maximum=253, show_label=False)
+                        gr.HTML(value="<span>/</span>", show_label=False)
+                        canny_threshold2 = gr.Slider(minimum=0, value=120, maximum=254, show_label=False)
+                        canny_generate_button = gr.Button("canny_generate", interactive=False)
+
                     self.prompt = gr.Textbox(label="prompt", lines=3)
                     self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value="lowres, error, extra digit, fewer digits, cropped, worst quality,low quality, normal quality, jpeg artifacts, blurry")
 
@@ -115,6 +133,12 @@ class Img2Img:
                 with gr.Column():
                     self.output_image = gr.Image(type="pil", label="output_image")
 
+            canny_generate_button.click(
+                        self.process_prompt_analysis,
+                        inputs=[self.input_image, canny_threshold1, canny_threshold2],
+                        outputs=self.canny_image
+            )
+
 
             prompt_analysis_button.click(
                         self.process_prompt_analysis,
@@ -123,9 +147,12 @@ class Img2Img:
             )
 
 
+
+
+
             generate_button.click(
                 fn=predict,
-                inputs=[self.input_image_path, self.prompt, self.negative_prompt, self.controlnet_scale],
+                inputs=[self.input_image_path, self.canny_image, self.prompt, self.negative_prompt, self.controlnet_scale],
                 outputs=self.output_image
             )
         return demo

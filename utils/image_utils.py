@@ -1,12 +1,31 @@
-import os
-
-import requests
-from tqdm import tqdm
-import shutil
-
 from PIL import Image, ImageOps
 import numpy as np
 import cv2
+
+def canny_process(image_path, threshold1, threshold2):
+    # 画像を開き、RGBA形式に変換して透過情報を保持
+    img = Image.open(image_path)
+    img = img.convert("RGBA")
+
+    canvas_image = Image.new('RGBA', img.size, (255, 255, 255, 255))
+    
+    # 画像をキャンバスにペーストし、透過部分が白色になるように設定
+    canvas_image.paste(img, (0, 0), img)
+
+    # RGBAからRGBに変換し、透過部分を白色にする
+    image_pil = canvas_image.convert("RGB")
+    image_np = np.array(image_pil)
+    
+    # グレースケール変換
+    gray = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
+    # Cannyエッジ検出
+    edges = cv2.Canny(gray, threshold1, threshold2)
+    
+    canny = Image.fromarray(edges)
+    
+    
+    return canny
+
 
 def resize_image_aspect_ratio(image):
     # 元の画像サイズを取得
