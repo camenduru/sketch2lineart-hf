@@ -2,7 +2,6 @@ import spaces
 import gradio as gr
 import torch
 from diffusers import ControlNetModel, StableDiffusionXLControlNetImg2ImgPipeline, DDIMScheduler
-from compel import Compel, ReturnedEmbeddingsType
 from PIL import Image
 import os
 import time
@@ -14,7 +13,6 @@ class Img2Img:
     def __init__(self):
         self.setup_paths()
         self.setup_models()
-        self.compel = self.setup_compel()
         self.demo = self.layout()
 
     def setup_paths(self):
@@ -46,13 +44,6 @@ class Img2Img:
         self.pipe.load_lora_weights(self.lora_dir, weight_name="sdxl_BWLine.safetensors")
         self.pipe = self.pipe.to(self.device)
 
-    def setup_compel(self):
-        return Compel(
-            tokenizer=[self.pipe.tokenizer, self.pipe.tokenizer_2],
-            text_encoder=[self.pipe.text_encoder, self.pipe.text_encoder_2],
-            returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
-            requires_pooled=[False, True],
-        )
 
     def layout(self):
         css = """
@@ -65,13 +56,13 @@ class Img2Img:
         with gr.Blocks(css=css) as demo:
             with gr.Row():
                 with gr.Column():
-                    self.input_image_path = gr.Image(label="入力画像", type='filepath')
+                    self.input_image_path = gr.Image(label="input_image", type='filepath')
                     self.prompt_analysis = PromptAnalysis(self.tagger_dir)
                     self.prompt, self.negative_prompt = self.prompt_analysis.layout(self.input_image_path)
                     self.controlnet_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, label="線画忠実度")
                     generate_button = gr.Button("生成")
                 with gr.Column():
-                    self.output_image = gr.Image(type="pil", label="生成画像")
+                    self.output_image = gr.Image(type="pil", label="出力画像")
 
             generate_button.click(
                 fn=self.predict,

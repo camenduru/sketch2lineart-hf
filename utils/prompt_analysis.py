@@ -22,7 +22,7 @@ class PromptAnalysis:
             with gr.Row():
                 self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value=self.default_nagative_prompt)
             with gr.Row():
-                self.prompt_analysis_button = gr.Button()
+                self.prompt_analysis_button = gr.Button("prompt解析")
 
         self.prompt_analysis_button.click(
             self.process_prompt_analysis,
