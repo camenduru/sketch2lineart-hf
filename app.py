@@ -133,4 +133,4 @@ class Img2Img:
 
 if __name__ == "__main__":
     ui = Img2Img()
-    ui.launch(share=False)
+    ui.launch()
