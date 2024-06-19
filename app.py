@@ -54,11 +54,9 @@ class Img2Img:
         self.tagger_model = modelLoad(self.tagger_dir)
 
     @staticmethod
-    def process_prompt_analysis(input_image_path,tagger_model,tagger_dir,post_filter):           
+    def process_prompt_analysis(input_image_path,tagger_model,tagger_dir):
         tags = analysis(input_image_path, tagger_dir, tagger_model)
-        tags_list = tags      
-        if post_filter:
-            tags_list = remove_color(tags)
+        tags_list = remove_color(tags)
         return tags_list
 
 
@@ -85,7 +83,7 @@ class Img2Img:
 
             prompt_analysis_button.click(
                         self.process_prompt_analysis,
-                        inputs=[self.input_image_path, self.tagger_model, self.tagger_dir, True],
+                        inputs=[self.input_image_path, self.tagger_model, self.tagger_dir],
                         outputs=self.prompt
             )
 
