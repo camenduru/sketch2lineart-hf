@@ -109,7 +109,7 @@ def resize_image_aspect_ratio(image):
     target_width, target_height = sizes[closest_aspect_ratio]
 
     # リサイズ処理
-    resized_image = image.resize((target_width, target_height), Image.ANTIALIAS)
+    resized_image = image.resize((target_width, target_height), Image.LANCZOS)
 
     return resized_image
 
