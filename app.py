@@ -111,4 +111,4 @@ class Img2Img:
         return output_image
 
 img2img = Img2Img()
-img2img.demo.launch(share=True, server_name="none")
+img2img.demo.launch(share=True, server_name="none", server_port=7890)
