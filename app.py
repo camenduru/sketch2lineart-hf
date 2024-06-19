@@ -74,13 +74,14 @@ pipe = pipe.to(device)
 
 @spaces.GPU
 def predict(
-    input_image,
+    input_image_path,
     prompt,
     negative_prompt,
     controlnet_conditioning_scale,
 ):
-    base_size =input_image.size
-    resize_image= resize_image_aspect_ratio(input_image)
+    input_image_pil = Image.open(input_image_path)
+    base_size =input_image_pil.size
+    resize_image= resize_image_aspect_ratio(input_image_pil)
     resize_image_size = resize_image.size
     width = resize_image_size[0]
     height = resize_image_size[1]
@@ -126,12 +127,12 @@ with gr.Blocks(css=css) as demo:
             # 画像アップロード用の行
             with gr.Row():
                 with gr.Column():
-                    input_image = gr.Image(label="入力画像", type="pil")
+                    input_image_path = gr.Image(label="入力画像",  type='filepath')
             
             # プロンプト入力用の行
             with gr.Row():
                 prompt_analysis = PromptAnalysis(tagger_dir)
-                [prompt, nega] = PromptAnalysis.layout(input_image)           
+                [prompt, nega] = PromptAnalysis.layout(input_image_path)           
             # 画像の詳細設定用のスライダー行
             with gr.Row():
                 controlnet_conditioning_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, interactive=True, label="線画忠実度")
@@ -145,7 +146,7 @@ with gr.Blocks(css=css) as demo:
 
         # インプットとアウトプットの設定
         inputs = [
-            input_image,
+            input_image_path,
             prompt,
             nega,
             controlnet_conditioning_scale,
@@ -155,7 +156,7 @@ with gr.Blocks(css=css) as demo:
         # ボタンのクリックイベントを設定
         generate_button.click(
             fn=predict,
-            inputs=[input_image, prompt, nega, controlnet_conditioning_scale],
+            inputs=[input_image_path, prompt, nega, controlnet_conditioning_scale],
             outputs=[output_image]
         )
 

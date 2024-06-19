@@ -15,7 +15,7 @@ class PromptAnalysis:
         self.model = None
         self.model_dir = model_dir 
 
-    def layout(self, input_image):
+    def layout(self, input_image_path):
         with gr.Column():
             with gr.Row():
                 self.prompt = gr.Textbox("prompt", lines=3)
@@ -26,7 +26,7 @@ class PromptAnalysis:
 
         self.prompt_analysis_button.click(
             self.process_prompt_analysis,
-            inputs=[input_image],
+            inputs=[input_image_path],
             outputs=self.prompt
         )
         return [self.prompt, self.negative_prompt]
