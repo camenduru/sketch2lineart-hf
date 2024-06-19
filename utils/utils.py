@@ -11,8 +11,7 @@ import cv2
 def load_cn_model(model_dir):
   folder = model_dir
   file_name = 'diffusion_pytorch_model.safetensors'
-  url = "https://huggingface.co/kataragi/ControlNet-LineartXL/resolve/main/Katarag_lineartXL-fp16.safetensors"
-
+  url = "  https://huggingface.co/2vXpSwA7/iroiro-lora/resolve/main/test_controlnet2/CN-anytest_v3-50000_fp16.safetensors"
   file_path = os.path.join(folder, file_name)
   if not os.path.exists(file_path):
     response = requests.get(url, stream=True)

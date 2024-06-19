@@ -15,14 +15,14 @@ class PromptAnalysis:
         self.model = None
         self.model_dir = model_dir 
 
-    def layout(self, lang_util, input_image):
+    def layout(self, input_image):
         with gr.Column():
             with gr.Row():
-                self.prompt = gr.Textbox(label=lang_util.get_text("prompt"), lines=3)
+                self.prompt = gr.Textbox("prompt", lines=3)
             with gr.Row():
-                self.negative_prompt = gr.Textbox(label=lang_util.get_text("negative_prompt"), lines=3, value=self.default_nagative_prompt)
+                self.negative_prompt = gr.Textbox("negative_prompt", lines=3, value=self.default_nagative_prompt)
             with gr.Row():
-                self.prompt_analysis_button = gr.Button(lang_util.get_text("analyze_prompt"))
+                self.prompt_analysis_button = gr.Button("analyze_prompt")
 
         self.prompt_analysis_button.click(
             self.process_prompt_analysis,
