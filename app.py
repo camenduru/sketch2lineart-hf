@@ -113,14 +113,10 @@ class Img2Img:
             with gr.Row():
                 with gr.Column():
                     self.input_image_path = gr.Image(label="input_image", type='filepath')
-                    self.line_image = gr.Image(label="line_image", type='pil')
                     self.prompt = gr.Textbox(label="prompt", lines=3)
                     self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value="lowres, error, extra digit, fewer digits, cropped, worst quality,low quality, normal quality, jpeg artifacts, blurry")
-
                     prompt_analysis_button = gr.Button("prompt_analysis")
-
-                    self.controlnet_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, label="controlnet_scale")
-                    
+                    self.controlnet_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, label="controlnet_scale")                 
                     generate_button = gr.Button("generate")
                 with gr.Column():
                     self.output_image = gr.Image(type="pil", label="output_image")
@@ -131,17 +127,12 @@ class Img2Img:
                         outputs=self.prompt
             )
 
-
-
-
-
             generate_button.click(
                 fn=predict,
                 inputs=[self.input_image_path, self.prompt, self.negative_prompt, self.controlnet_scale],
                 outputs=self.output_image
             )
         return demo
-
 
 
 img2img = Img2Img()
