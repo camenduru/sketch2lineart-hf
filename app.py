@@ -133,4 +133,5 @@ class Img2Img:
         return output_image
 
 img2img = Img2Img()
+img2img.demo.queue()
 img2img.demo.launch(share=True)
