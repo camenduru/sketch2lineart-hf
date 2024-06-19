@@ -79,17 +79,11 @@ class Img2Img:
             with gr.Row():
                 with gr.Column():
                     self.input_image_path = gr.Image(label="input_image", type='filepath')
-                with gr.Column():
-                    with gr.Row():
-                        self.prompt = gr.Textbox(label="prompt", lines=3)
-                    with gr.Row():
-                        self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value="lowres, error, extra digit, fewer digits, cropped, worst quality,low quality, normal quality, jpeg artifacts, blurry")
-                    with gr.Row():
-                        prompt_analysis_button = gr.Button("prompt解析")
-                    with gr.Row():
-                        self.controlnet_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, label="線画忠実度")
-                    with gr.Row():                        
-                        generate_button = gr.Button("生成")
+                    self.prompt = gr.Textbox(label="prompt", lines=3)
+                    self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value="lowres, error, extra digit, fewer digits, cropped, worst quality,low quality, normal quality, jpeg artifacts, blurry")
+                    prompt_analysis_button = gr.Button("prompt解析")
+                    self.controlnet_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, label="線画忠実度")
+                    generate_button = gr.Button("生成")
                 with gr.Column():
                     self.output_image = gr.Image(type="pil", label="出力画像")
 
