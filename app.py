@@ -12,8 +12,6 @@ from utils.image_utils import resize_image_aspect_ratio, base_generation
 from utils.prompt_utils import execute_prompt, remove_color, remove_duplicates
 from utils.tagger import modelLoad, analysis
 
-
-
 path = os.getcwd()
 cn_dir = f"{path}/controlnet"
 tagger_dir = f"{path}/tagger"
@@ -99,7 +97,7 @@ class Img2Img:
                 with gr.Column():
                     self.input_image_path = gr.Image(label="input_image", type='filepath')
                     self.prompt = gr.Textbox(label="prompt", lines=3)
-                    self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value="lowres, error, extra digit, fewer digits, cropped, worst quality,low quality, normal quality, jpeg artifacts, blurry")
+                    self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value="sketch, lowres, error, extra digit, fewer digits, cropped, worst quality,low quality, normal quality, jpeg artifacts, blurry")
                     prompt_analysis_button = gr.Button("prompt_analysis")
                     self.controlnet_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, label="controlnet_scale")                 
                     generate_button = gr.Button("generate")

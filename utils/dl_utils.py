@@ -33,7 +33,7 @@ def dl_cn_config(model_dir):
      shutil.copy(config_path, file_path)
 
 def dl_tagger_model(model_dir):
-    model_id = 'SmilingWolf/wd-swinv2-tagger-v3'
+    model_id = 'SmilingWolf/wd-vit-tagger-v3'
     files = [
         'config.json', 'model.onnx', 'selected_tags.csv', 'sw_jax_cv_config.json'
     ]
