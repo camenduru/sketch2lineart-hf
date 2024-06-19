@@ -79,8 +79,6 @@ def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
 
 class Img2Img:
     def __init__(self):
-        self.setup_paths()
-        self.setup_models()
         self.demo = self.layout()
         self.post_filter = True
         self.tagger_model = None
