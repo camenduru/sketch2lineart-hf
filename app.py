@@ -33,9 +33,9 @@ def load_model(lora_dir, cn_dir):
     pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
         "cagliostrolab/animagine-xl-3.1", controlnet=controlnet, vae=vae, torch_dtype=torch.float16
     )
-    pipe.load_lora_weights(lora_dir, weight_name="sdxl_BW_bold_Line.safetensors", adapter_name="sdxl_BW_bold_Line")
-    pipe.set_adapters(["sdxl_BW_bold_Line"], adapter_weights=[1.2])
-    pipe.fuse_lora()
+    pipe.load_lora_weights(lora_dir, weight_name="sdxl_BW_bold_Line.safetensors")
+    # pipe.set_adapters(["sdxl_BW_bold_Line"], adapter_weights=[1.2])
+    # pipe.fuse_lora()
     pipe = pipe.to(device)
     return pipe
 
