@@ -16,7 +16,7 @@ import os
 import time
 import numpy as np
 
-from utils.utils import load_cn_model, load_cn_config, load_tagger_model, resize_image_aspect_ratio, base_generation
+from utils.utils import load_cn_model, load_cn_config, load_tagger_model, load_lora_model, resize_image_aspect_ratio, base_generation
 from utils.prompt_analysis import PromptAnalysis
 
 path = os.getcwd()
@@ -24,10 +24,13 @@ cn_dir = f"{path}/controlnet"
 os.makedirs(cn_dir)
 tagger_dir = f"{path}/tagger"
 os.mkdir(tagger_dir)
+lora_dir = f"{path}/lora"
+os.mkdir(lora_dir)
 
 load_cn_model(cn_dir)
 load_cn_config(cn_dir)
 load_tagger_model(tagger_dir)
+load_lora_model(lora_dir)
 
 IS_SPACES_ZERO = os.environ.get("SPACES_ZERO_GPU", "0") == "1"
 IS_SPACE = os.environ.get("SPACE_ID", None) is not None
@@ -49,10 +52,15 @@ pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
     model,
     controlnet=controlnet,
     torch_dtype=dtype,
-    variant="fp16",
     use_safetensors=True,
     scheduler=scheduler,
 )
+
+pipe.load_lora_weights(
+    lora_dir, 
+    weight_name="sdxl_BWLine.safetensors"
+)
+
 
 compel = Compel(
     tokenizer=[pipe.tokenizer, pipe.tokenizer_2],

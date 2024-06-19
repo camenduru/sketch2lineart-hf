@@ -61,6 +61,28 @@ def load_tagger_model(model_dir):
             print(f'{file} already exists.')
 
 
+def load_lora_model(model_dir):
+  folder = model_dir
+  file_name = 'sdxl_BWLine.safetensors'
+  url = "https://huggingface.co/tori29umai/lineart/resolve/main/sdxl_BWLine.safetensors"
+
+  file_path = os.path.join(folder, file_name)
+  if not os.path.exists(file_path):
+    response = requests.get(url, stream=True)
+
+    total_size = int(response.headers.get('content-length', 0))
+    with open(file_path, 'wb') as f, tqdm(
+            desc=file_name,
+            total=total_size,
+            unit='iB',
+            unit_scale=True,
+            unit_divisor=1024,
+        ) as bar:
+        for data in response.iter_content(chunk_size=1024):
+            size = f.write(data)
+            bar.update(size)            
+
+
 def resize_image_aspect_ratio(image):
     # 元の画像サイズを取得
     original_width, original_height = image.size
