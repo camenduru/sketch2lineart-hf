@@ -134,7 +134,7 @@ class Img2Img:
                     self.output_image = gr.Image(type="pil", label="output_image")
 
             canny_generate_button.click(
-                        self.process_prompt_analysis,
+                        self._make_canny,
                         inputs=[self.input_image_path, canny_threshold1, canny_threshold2],
                         outputs=self.canny_image
             )
