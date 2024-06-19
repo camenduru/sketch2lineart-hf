@@ -135,7 +135,7 @@ class Img2Img:
 
             canny_generate_button.click(
                         self.process_prompt_analysis,
-                        inputs=[self.input_image, canny_threshold1, canny_threshold2],
+                        inputs=[self.input_image_path, canny_threshold1, canny_threshold2],
                         outputs=self.canny_image
             )
 
