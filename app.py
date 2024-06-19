@@ -7,7 +7,8 @@ import os
 import time
 
 from utils.utils import load_cn_model, load_cn_config, load_tagger_model, load_lora_model, resize_image_aspect_ratio, base_generation
-from utils.prompt_analysis import PromptAnalysis
+from utils.prompt_utils import remove_color
+from utils.tagger import modelLoad, analysis
 
 
 def load_model(lora_dir, cn_dir):
@@ -28,14 +29,14 @@ def load_model(lora_dir, cn_dir):
     return pipe
 
 
-
-
-
 class Img2Img:
     def __init__(self):
         self.setup_paths()
         self.setup_models()
         self.demo = self.layout()
+        self.default_nagative_prompt = "lowres, error, extra digit, fewer digits, cropped, worst quality,low quality, normal quality, jpeg artifacts, blurry"
+        self.post_filter = True
+        self.tagger_model = None
 
     def setup_paths(self):
         self.path = os.getcwd()
@@ -52,6 +53,33 @@ class Img2Img:
         load_tagger_model(self.tagger_dir)
         load_lora_model(self.lora_dir)
 
+
+    def prompt_layout(self, input_image_path):
+        with gr.Column():
+            with gr.Row():
+                self.prompt = gr.Textbox(label="prompt", lines=3)
+            with gr.Row():
+                self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value=self.default_nagative_prompt)
+            with gr.Row():
+                self.prompt_analysis_button = gr.Button("prompt解析")
+
+        self.prompt_analysis_button.click(
+            self.process_prompt_analysis,
+            inputs=[input_image_path],
+            outputs=self.prompt
+        )
+        return [self.prompt, self.negative_prompt]
+
+    def process_prompt_analysis(self, input_image_path):
+        if self.tagger_model is None:
+            self.tagger_model = modelLoad(self.tagger_dir)
+        tags = analysis(input_image_path, self.tagger_dir, self.tagger_model)
+        tags_list = tags      
+        if self.post_filter:
+            tags_list = remove_color(tags)
+        return tags_list
+
+
     def layout(self):
         css = """
         #intro{
@@ -64,8 +92,7 @@ class Img2Img:
             with gr.Row():
                 with gr.Column():
                     self.input_image_path = gr.Image(label="input_image", type='filepath')
-                    self.prompt_analysis = PromptAnalysis(self.tagger_dir)
-                    self.prompt, self.negative_prompt = self.prompt_analysis.layout(self.input_image_path)
+                    self.prompt, self.negative_prompt = self.prompt_layout(self.input_image_path)
                     self.controlnet_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, label="線画忠実度")
                     generate_button = gr.Button("生成")
                 with gr.Column():
@@ -111,4 +138,4 @@ class Img2Img:
         return output_image
 
 img2img = Img2Img()
-img2img.demo.launch(share=True, server_name="none", server_port=7890)
+img2img.demo.launch(share=True)
