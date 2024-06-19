@@ -38,7 +38,7 @@ def load_model(lora_dir, cn_dir):
         use_safetensors=True,
         scheduler=scheduler,
     )
-    pipe.load_lora_weights(lora_dir, weight_name="sdxl_BWLine.safetensors")
+    # pipe.load_lora_weights(lora_dir, weight_name="sdxl_BWLine.safetensors")
     pipe = pipe.to(device)
     return pipe
 
@@ -59,6 +59,7 @@ def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
     prompt = execute_prompt(execute_tags, prompt)
     prompt = remove_duplicates(prompt)        
     prompt = remove_color(prompt)
+    print(prompt)
 
     output_image = pipe(
         image=white_base_pil,
