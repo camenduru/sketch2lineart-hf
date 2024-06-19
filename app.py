@@ -134,7 +134,7 @@ with gr.Blocks(css=css) as demo:
                 [prompt, nega] = PromptAnalysis.layout(input_image)           
             # 画像の詳細設定用のスライダー行
             with gr.Row():
-                controlnet_conditioning_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, interactive=True, label="ラインアートの忠実度")
+                controlnet_conditioning_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, interactive=True, label="線画忠実度")
            
             # 画像生成ボタンの行
             with gr.Row():
