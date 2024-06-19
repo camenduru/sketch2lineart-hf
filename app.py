@@ -36,7 +36,7 @@ IS_SPACES_ZERO = os.environ.get("SPACES_ZERO_GPU", "0") == "1"
 IS_SPACE = os.environ.get("SPACE_ID", None) is not None
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-dtype = torch.float
+dtype = torch.float16
 
 LOW_MEMORY = os.getenv("LOW_MEMORY", "0") == "1"
 
