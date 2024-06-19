@@ -19,3 +19,4 @@ hidiffusion==0.1.8
 spaces
 torch==2.2
 controlnet-aux==0.0.9
+onnxruntime
