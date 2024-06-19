@@ -62,7 +62,7 @@ def predict(input_image_path, line_image, prompt, negative_prompt, controlnet_sc
 
     output_image = pipe(
         image=line_image,
-        control_image=line_image,
+        control_image=resize_image,
         strength=1.0,
         prompt=prompt,
         negative_prompt = negative_prompt,
