@@ -21,7 +21,9 @@ from utils.prompt_analysis import PromptAnalysis
 
 path = os.getcwd()
 cn_dir = f"{path}/controlnet"
+os.makedirs(cn_dir)
 tagger_dir = f"{path}/tagger"
+os.mkdir(tagger_dir)
 
 load_cn_model(cn_dir)
 load_cn_config(cn_dir)

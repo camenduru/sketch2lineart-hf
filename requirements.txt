@@ -21,3 +21,4 @@ torch==2.2
 controlnet-aux==0.0.9
 onnx
 onnxruntime
+mediapipe
