@@ -22,8 +22,8 @@ os.makedirs(cn_dir, exist_ok=True)
 os.makedirs(tagger_dir, exist_ok=True)
 os.makedirs(lora_dir, exist_ok=True)
 
-# dl_cn_model(cn_dir)
-# dl_cn_config(cn_dir)
+dl_cn_model(cn_dir)
+dl_cn_config(cn_dir)
 dl_tagger_model(tagger_dir)
 dl_lora_model(lora_dir)
 
@@ -31,11 +31,7 @@ def load_model(lora_dir, cn_dir):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     dtype = torch.float16
     vae = AutoencoderKL.from_pretrained("madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16)
-    # controlnet = ControlNetModel.from_pretrained(cn_dir, torch_dtype=dtype, use_safetensors=True)
-    controlnet = ControlNetModel.from_pretrained(
-        "diffusers/controlnet-canny-sdxl-1.0",
-        torch_dtype=torch.float16
-    )
+    controlnet = ControlNetModel.from_pretrained(cn_dir, torch_dtype=dtype, use_safetensors=True)
     pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
         "cagliostrolab/animagine-xl-3.1", controlnet=controlnet, vae=vae, torch_dtype=torch.float16
     )
