@@ -97,7 +97,9 @@ class Img2Img:
                 inputs=[self.input_image_path, self.prompt, self.negative_prompt, self.controlnet_scale],
                 outputs=self.output_image
             )
-        return demo
+
+        self.demo.queue()
+        self.demo.launch(share=True)
 
     @spaces.GPU
     def predict(self, input_image_path, prompt, negative_prompt, controlnet_scale):
@@ -131,7 +133,3 @@ class Img2Img:
         print(f"Time taken: {time.time() - last_time}")
         output_image = output_image.resize(base_size, Image.LANCZOS)
         return output_image
-
-img2img = Img2Img()
-img2img.demo.queue()
-img2img.demo.launch(share=True)
