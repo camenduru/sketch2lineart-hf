@@ -1,6 +1,5 @@
 import spaces
 import gradio as gr
-from gradio_imageslider import ImageSlider
 import torch
 
 torch.jit.script = lambda f: f
@@ -127,43 +126,42 @@ class Img2Img:
     """
     def layout(self,css):
         with gr.Blocks(css=css) as demo:
-            with gr.Row() as block:
-                with gr.Column():
-                    # 画像アップロード用の行
-                    with gr.Row():
-                        with gr.Column():
-                            self.input_image_path = gr.Image(label="入力画像",  type='filepath')
-                    
-                    # プロンプト入力用の行
-                    with gr.Row():
-                        prompt_analysis = PromptAnalysis(tagger_dir)
-                        [prompt, nega] = prompt_analysis.layout(self.input_image_path)           
-                    # 画像の詳細設定用のスライダー行
-                    with gr.Row():
-                        controlnet_conditioning_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, interactive=True, label="線画忠実度")
+            with gr.Column():
+                # 画像アップロード用の行
+                with gr.Row():
+                    with gr.Column():
+                        self.input_image_path = gr.Image(label="入力画像",  type='filepath')
                 
-                    # 画像生成ボタンの行
-                    with gr.Row():
-                        generate_button = gr.Button("生成", interactive=False)
+                # プロンプト入力用の行
+                with gr.Row():
+                    prompt_analysis = PromptAnalysis(tagger_dir)
+                    [prompt, nega] = prompt_analysis.layout(self.input_image_path)           
+                # 画像の詳細設定用のスライダー行
+                with gr.Row():
+                    controlnet_conditioning_scale = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, interactive=True, label="線画忠実度")
+            
+                # 画像生成ボタンの行
+                with gr.Row():
+                    generate_button = gr.Button("生成", interactive=False)
 
-                with gr.Column():
-                    output_image = gr.Image(type="pil", label="Output Image")
+            with gr.Column():
+                output_image = gr.Image(type="pil", label="Output Image")
 
-                # インプットとアウトプットの設定
-                inputs = [
-                    self.input_image_path,
-                    prompt,
-                    nega,
-                    controlnet_conditioning_scale,
-                ]
-                outputs = [output_image]
-                
-                # ボタンのクリックイベントを設定
-                generate_button.click(
-                    fn=self.predict,
-                    inputs=[self.input_image_path, prompt, nega, controlnet_conditioning_scale],
-                    outputs=[output_image]
-                )
+            # インプットとアウトプットの設定
+            inputs = [
+                self.input_image_path,
+                prompt,
+                nega,
+                controlnet_conditioning_scale,
+            ]
+            outputs = [output_image]
+            
+            # ボタンのクリックイベントを設定
+            generate_button.click(
+                fn=self.predict,
+                inputs=[self.input_image_path, prompt, nega, controlnet_conditioning_scale],
+                outputs=[output_image]
+            )
 
         # デモの設定と起動
         demo.queue(api_open=True)
