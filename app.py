@@ -34,7 +34,6 @@ class Img2Img:
         self.setup_paths()
         self.setup_models()
         self.demo = self.layout()
-        self.default_nagative_prompt = "lowres, error, extra digit, fewer digits, cropped, worst quality,low quality, normal quality, jpeg artifacts, blurry"
         self.post_filter = True
         self.tagger_model = None
         self.input_image_path = None
@@ -60,7 +59,7 @@ class Img2Img:
             with gr.Row():
                 self.prompt = gr.Textbox(label="prompt", lines=3)
             with gr.Row():
-                self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value=self.default_nagative_prompt)
+                self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value="lowres, error, extra digit, fewer digits, cropped, worst quality,low quality, normal quality, jpeg artifacts, blurry")
             with gr.Row():
                 self.prompt_analysis_button = gr.Button("prompt解析")
 
