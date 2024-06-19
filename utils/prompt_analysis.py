@@ -7,13 +7,13 @@ from utils.tagger import modelLoad, analysis
 
 
 class PromptAnalysis:
-    def __init__(self, app_config, post_filter=True,
+    def __init__(self, model_dir, post_filter=True,
                  default_nagative_prompt="lowres, error, extra digit, fewer digits, cropped, worst quality, "
                                          "low quality, normal quality, jpeg artifacts, blurry"):
         self.default_nagative_prompt = default_nagative_prompt
         self.post_filter = post_filter
         self.model = None
-        self.model_dir = os.path.join(app_config.dpath, 'models/tagger')
+        self.model_dir = model_dir 
 
     def layout(self, lang_util, input_image):
         with gr.Column():
