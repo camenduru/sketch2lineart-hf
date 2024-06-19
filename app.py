@@ -9,6 +9,28 @@ import time
 from utils.utils import load_cn_model, load_cn_config, load_tagger_model, load_lora_model, resize_image_aspect_ratio, base_generation
 from utils.prompt_analysis import PromptAnalysis
 
+
+def load_model():
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    dtype = torch.float16
+    model = "cagliostrolab/animagine-xl-3.1"
+    scheduler = DDIMScheduler.from_pretrained(model, subfolder="scheduler")
+    controlnet = ControlNetModel.from_pretrained(cn_dir, torch_dtype=dtype, use_safetensors=True)
+    pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
+        model,
+        controlnet=controlnet,
+        torch_dtype=dtype,
+        use_safetensors=True,
+        scheduler=scheduler,
+    )
+    pipe.load_lora_weights(lora_dir, weight_name="sdxl_BWLine.safetensors")
+    pipe = pipe.to(device)
+    return pipe
+
+
+
+
+
 class Img2Img:
     def __init__(self):
         self.setup_paths()
@@ -23,27 +45,6 @@ class Img2Img:
         os.makedirs(self.cn_dir, exist_ok=True)
         os.makedirs(self.tagger_dir, exist_ok=True)
         os.makedirs(self.lora_dir, exist_ok=True)
-
-    def setup_models(self):
-        load_cn_model(self.cn_dir)
-        load_cn_config(self.cn_dir)
-        load_tagger_model(self.tagger_dir)
-        load_lora_model(self.lora_dir)
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.dtype = torch.float16
-        self.model = "cagliostrolab/animagine-xl-3.1"
-        self.scheduler = DDIMScheduler.from_pretrained(self.model, subfolder="scheduler")
-        self.controlnet = ControlNetModel.from_pretrained(self.cn_dir, torch_dtype=self.dtype, use_safetensors=True)
-        self.pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
-            self.model,
-            controlnet=self.controlnet,
-            torch_dtype=self.dtype,
-            use_safetensors=True,
-            scheduler=self.scheduler,
-        )
-        self.pipe.load_lora_weights(self.lora_dir, weight_name="sdxl_BWLine.safetensors")
-        self.pipe = self.pipe.to(self.device)
-
 
     def layout(self):
         css = """
@@ -73,24 +74,22 @@ class Img2Img:
 
     @spaces.GPU
     def predict(self, input_image_path, prompt, negative_prompt, controlnet_scale):
+        pipe = load_model() 
         input_image_pil = Image.open(input_image_path)
         base_size = input_image_pil.size
         resize_image = resize_image_aspect_ratio(input_image_pil)
         resize_image_size = resize_image.size
         width, height = resize_image_size
         white_base_pil = base_generation(resize_image.size, (255, 255, 255, 255)).convert("RGB")
-        conditioning, pooled = self.compel([prompt, negative_prompt])
         generator = torch.manual_seed(0)
         last_time = time.time()
 
-        output_image = self.pipe(
+        output_image = pipe(
             image=white_base_pil,
             control_image=resize_image,
             strength=1.0,
-            prompt_embeds=conditioning[0:1],
-            pooled_prompt_embeds=pooled[0:1],
-            negative_prompt_embeds=conditioning[1:2],
-            negative_pooled_prompt_embeds=pooled[1:2],
+            prompt=prompt,
+            negative_prompt = negative_prompt,
             width=width,
             height=height,
             controlnet_conditioning_scale=float(controlnet_scale),
@@ -100,7 +99,7 @@ class Img2Img:
             num_inference_steps=30,
             guidance_scale=8.5,
             eta=1.0,
-        )
+        ).images[0]
         print(f"Time taken: {time.time() - last_time}")
         output_image = output_image.resize(base_size, Image.LANCZOS)
         return output_image
