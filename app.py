@@ -120,7 +120,7 @@ class Img2Img:
                         canny_threshold1 = gr.Slider(minimum=0, value=20, maximum=253, show_label=False)
                         gr.HTML(value="<span>/</span>", show_label=False)
                         canny_threshold2 = gr.Slider(minimum=0, value=120, maximum=254, show_label=False)
-                        canny_generate_button = gr.Button("canny_generate", interactive=False)
+                        canny_generate_button = gr.Button("canny_generate")
 
                     self.prompt = gr.Textbox(label="prompt", lines=3)
                     self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value="lowres, error, extra digit, fewer digits, cropped, worst quality,low quality, normal quality, jpeg artifacts, blurry")
