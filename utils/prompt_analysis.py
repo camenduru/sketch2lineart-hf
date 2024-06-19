@@ -18,11 +18,11 @@ class PromptAnalysis:
     def layout(self, input_image_path):
         with gr.Column():
             with gr.Row():
-                self.prompt = gr.Textbox("prompt", lines=3)
+                self.prompt = gr.Textbox(label="prompt", lines=3)
             with gr.Row():
-                self.negative_prompt = gr.Textbox("negative_prompt", lines=3, value=self.default_nagative_prompt)
+                self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value=self.default_nagative_prompt)
             with gr.Row():
-                self.prompt_analysis_button = gr.Button("analyze_prompt")
+                self.prompt_analysis_button = gr.Button()
 
         self.prompt_analysis_button.click(
             self.process_prompt_analysis,

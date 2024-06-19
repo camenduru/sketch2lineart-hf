@@ -1,4 +1,4 @@
-gradio==4.29.0
+gradio==4.36.1
 accelerate
 transformers
 torchvision
@@ -7,7 +7,6 @@ accelerate
 invisible-watermark
 huggingface-hub
 hf-transfer
-gradio_imageslider==0.0.20
 compel
 opencv-python
 numpy
