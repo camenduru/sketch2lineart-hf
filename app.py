@@ -126,7 +126,7 @@ class Img2Img:
 
 
             generate_button.click(
-                fn=self.predict,
+                fn=predict,
                 inputs=[self.input_image_path, self.prompt, self.negative_prompt, self.controlnet_scale],
                 outputs=self.output_image
             )
