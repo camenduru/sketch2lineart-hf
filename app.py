@@ -101,7 +101,8 @@ class Img2Img:
 
     @spaces.GPU
     def predict(self, input_image_path, prompt, negative_prompt, controlnet_scale):
-        pipe = load_model(self.lora_dir, self.cn_dir) 
+        # モデルのロードをここに移動
+        pipe = load_model(self.lora_dir, self.cn_dir)
         input_image_pil = Image.open(input_image_path)
         base_size = input_image_pil.size
         resize_image = resize_image_aspect_ratio(input_image_pil)
@@ -116,7 +117,7 @@ class Img2Img:
             control_image=resize_image,
             strength=1.0,
             prompt=prompt,
-            negative_prompt = negative_prompt,
+            negative_prompt=negative_prompt,
             width=width,
             height=height,
             controlnet_conditioning_scale=float(controlnet_scale),
