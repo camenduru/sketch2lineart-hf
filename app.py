@@ -44,13 +44,13 @@ def load_model(lora_dir, cn_dir):
 
 
 @spaces.GPU
-def predict(input_image_path, canny_image, prompt, negative_prompt, controlnet_scale):
+def predict(input_image_path, line_image, prompt, negative_prompt, controlnet_scale):
     pipe = load_model(lora_dir, cn_dir) 
     input_image_pil = Image.open(input_image_path)
     base_size = input_image_pil.size
     resize_image = resize_image_aspect_ratio(input_image_pil)
     white_base_pil = base_generation(resize_image.size, (255, 255, 255, 255)).convert("RGB")
-    canny_image = canny_image.resize(resize_image.size, Image.LANCZOS)
+    line_image = line_image.resize(resize_image.size, Image.LANCZOS)
     generator = torch.manual_seed(0)
     last_time = time.time()
     prompt = "masterpiece, best quality, monochrome, lineart, white background, " + prompt
@@ -61,8 +61,8 @@ def predict(input_image_path, canny_image, prompt, negative_prompt, controlnet_s
     print(prompt)
 
     output_image = pipe(
-        image=white_base_pil,
-        control_image=canny_image,
+        image=line_image,
+        control_image=line_image,
         strength=1.0,
         prompt=prompt,
         negative_prompt = negative_prompt,
@@ -112,11 +112,11 @@ class Img2Img:
             with gr.Row():
                 with gr.Column():
                     self.input_image_path = gr.Image(label="input_image", type='filepath')
-                    self.canny_image = gr.Image(label="canny_image", type='pil')
+                    self.line_image = gr.Image(label="line_image", type='pil')
                     with gr.Row():
-                        line_sigma = gr.Slider(minimum=0.1, value=1.4, maximum=3.0, show_label=False)
-                        line_gamma = gr.Slider(minimum=0.5, value=0.98, maximum=2.0, show_label=False)
-                        canny_generate_button = gr.Button("canny_generate")
+                        line_sigma = gr.Slider(label="sigma", minimum=0.1, value=1.4, maximum=3.0, show_label=False)
+                        line_gamma = gr.Slider(label="gamma", minimum=0.5, value=0.98, maximum=2.0, show_label=False)
+                        line_generate_button = gr.Button("line_generate")
 
                     self.prompt = gr.Textbox(label="prompt", lines=3)
                     self.negative_prompt = gr.Textbox(label="negative_prompt", lines=3, value="lowres, error, extra digit, fewer digits, cropped, worst quality,low quality, normal quality, jpeg artifacts, blurry")
@@ -129,10 +129,10 @@ class Img2Img:
                 with gr.Column():
                     self.output_image = gr.Image(type="pil", label="output_image")
 
-            canny_generate_button.click(
+            line_generate_button.click(
                         self._make_line,
                         inputs=[self.input_image_path, line_sigma, line_gamma],
-                        outputs=self.canny_image
+                        outputs=self.line_image
             )
 
 
