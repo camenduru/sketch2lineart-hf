@@ -151,7 +151,7 @@ class Img2Img:
 
                 # インプットとアウトプットの設定
                 inputs = [
-                    input_image_path,
+                    self.input_image_path,
                     prompt,
                     nega,
                     controlnet_conditioning_scale,
