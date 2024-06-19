@@ -9,24 +9,20 @@ import numpy as np
 import cv2
 
 def load_cn_model(model_dir):
-  folder = model_dir
-  file_name = 'diffusion_pytorch_model.safetensors'
-  url = "  https://huggingface.co/2vXpSwA7/iroiro-lora/resolve/main/test_controlnet2/CN-anytest_v3-50000_fp16.safetensors"
-  file_path = os.path.join(folder, file_name)
-  if not os.path.exists(file_path):
-    response = requests.get(url, stream=True)
-
-    total_size = int(response.headers.get('content-length', 0))
-    with open(file_path, 'wb') as f, tqdm(
-            desc=file_name,
-            total=total_size,
-            unit='iB',
-            unit_scale=True,
-            unit_divisor=1024,
-        ) as bar:
-        for data in response.iter_content(chunk_size=1024):
-            size = f.write(data)
-            bar.update(size)
+    folder = model_dir
+    file_name = 'diffusion_pytorch_model.safetensors'
+    url = "  https://huggingface.co/2vXpSwA7/iroiro-lora/resolve/main/test_controlnet2/CN-anytest_v3-50000_fp16.safetensors"
+    file_path = os.path.join(folder, file_name)
+    if not os.path.exists(file_path):
+        response = requests.get(url, allow_redirects=True)
+        if response.status_code == 200:
+            with open(file_path, 'wb') as f:
+                f.write(response.content)
+            print(f'Downloaded {file_name}')
+        else:
+            print(f'Failed to download {file_name}')
+    else:
+        print(f'{file_name} already exists.')
 
 def load_cn_config(model_dir):
   folder = model_dir
@@ -61,27 +57,21 @@ def load_tagger_model(model_dir):
 
 
 def load_lora_model(model_dir):
-  folder = model_dir
-  file_name = 'style-lineart_02.safetensors'
-  url = "https://huggingface.co/2vXpSwA7/iroiro-lora/resolve/main/test3/style-lineart_02.safetensors"
+    file_name = 'style-lineart_02.safetensors'
+    file_path = os.path.join(model_dir, file_name)
+    if not os.path.exists(file_path):
+        url = "https://huggingface.co/2vXpSwA7/iroiro-lora/resolve/main/test3/style-lineart_02.safetensors"
+        response = requests.get(url, allow_redirects=True)
+        if response.status_code == 200:
+            with open(file_path, 'wb') as f:
+                f.write(response.content)
+            print(f'Downloaded {file_name}')
+        else:
+            print(f'Failed to download {file_name}')
+    else:
+        print(f'{file_name} already exists.')
 
-  file_path = os.path.join(folder, file_name)
-  if not os.path.exists(file_path):
-    response = requests.get(url, stream=True)
-
-    total_size = int(response.headers.get('content-length', 0))
-    with open(file_path, 'wb') as f, tqdm(
-            desc=file_name,
-            total=total_size,
-            unit='iB',
-            unit_scale=True,
-            unit_divisor=1024,
-        ) as bar:
-        for data in response.iter_content(chunk_size=1024):
-            size = f.write(data)
-            bar.update(size)            
-
-
+ 
 def resize_image_aspect_ratio(image):
     # 元の画像サイズを取得
     original_width, original_height = image.size
