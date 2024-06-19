@@ -6,7 +6,9 @@ from PIL import Image
 import os
 import time
 
-from utils.utils import load_cn_model, load_cn_config, load_tagger_model, load_lora_model, resize_image_aspect_ratio, base_generation
+from utils.dl_utils import load_cn_model, load_cn_config, load_tagger_model, load_lora_model
+from utils.image_utils import resize_image_aspect_ratio, base_generation
+
 from utils.prompt_utils import execute_prompt, remove_color, remove_duplicates
 from utils.tagger import modelLoad, analysis
 
