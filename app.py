@@ -34,7 +34,6 @@ class Img2Img:
         self.setup_paths()
         self.setup_models()
         self.demo = self.layout()
-        self.post_filter = True
         self.input_image_path = None
 
 
@@ -86,7 +85,7 @@ class Img2Img:
 
             prompt_analysis_button.click(
                         self.process_prompt_analysis,
-                        inputs=[self.input_image_path, self.tagger_model, self.tagger_dir, self.post_filter],
+                        inputs=[self.input_image_path, self.tagger_model, self.tagger_dir, True],
                         outputs=self.prompt
             )
 
