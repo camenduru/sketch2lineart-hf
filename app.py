@@ -10,7 +10,7 @@ from utils.utils import load_cn_model, load_cn_config, load_tagger_model, load_l
 from utils.prompt_analysis import PromptAnalysis
 
 
-def load_model():
+def load_model(lora_dir, cn_dir):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     dtype = torch.float16
     model = "cagliostrolab/animagine-xl-3.1"
@@ -74,7 +74,7 @@ class Img2Img:
 
     @spaces.GPU
     def predict(self, input_image_path, prompt, negative_prompt, controlnet_scale):
-        pipe = load_model() 
+        pipe = load_model(self.lora_dir, self.cn_dir) 
         input_image_pil = Image.open(input_image_path)
         base_size = input_image_pil.size
         resize_image = resize_image_aspect_ratio(input_image_pil)
