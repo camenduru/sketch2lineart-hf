@@ -6,7 +6,7 @@ from PIL import Image
 import os
 import time
 
-from utils.dl_utils import load_cn_model, load_cn_config, load_tagger_model, load_lora_model
+from utils.dl_utils import dl_cn_model, dl_cn_config, dl_tagger_model, dl_lora_model
 from utils.image_utils import resize_image_aspect_ratio, base_generation
 
 from utils.prompt_utils import execute_prompt, remove_color, remove_duplicates
@@ -22,10 +22,10 @@ os.makedirs(cn_dir, exist_ok=True)
 os.makedirs(tagger_dir, exist_ok=True)
 os.makedirs(lora_dir, exist_ok=True)
 
-load_cn_model(cn_dir)
-load_cn_config(cn_dir)
-load_tagger_model(tagger_dir)
-load_lora_model(lora_dir)
+dl_cn_model(cn_dir)
+dl_cn_config(cn_dir)
+dl_tagger_model(tagger_dir)
+dl_lora_model(lora_dir)
 
 def load_model(lora_dir, cn_dir):
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -35,8 +35,8 @@ def load_model(lora_dir, cn_dir):
     pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
         "cagliostrolab/animagine-xl-3.1", controlnet=controlnet, vae=vae, torch_dtype=torch.float16
     )
-    pipe.load_lora_weights(lora_dir, weight_name="sdxl_BW_bold_Line.safetensors")
-    pipe.set_adapters(["sdxl_BW_bold_Line"], adapter_weights=[1.2])
+    pipe.load_lora_weights(lora_dir, weight_name="sdxl_BW_Line.safetensors")
+    pipe.set_adapters(["sdxl_BW_Line"], adapter_weights=[1.4])
     pipe.fuse_lora()
     pipe = pipe.to(device)
     return pipe
