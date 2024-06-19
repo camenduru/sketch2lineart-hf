@@ -11,7 +11,7 @@ import cv2
 def dl_cn_model(model_dir):
     folder = model_dir
     file_name = 'diffusion_pytorch_model.safetensors'
-    url = "https://huggingface.co/2vXpSwA7/iroiro-lora/resolve/main/test_controlnet2/CN-anytest_v4-marged.safetensors"
+    url = "https://huggingface.co/2vXpSwA7/iroiro-lora/resolve/main/test_controlnet2/CN-anytest_v3-50000_fp16.safetensors"
     file_path = os.path.join(folder, file_name)
     if not os.path.exists(file_path):
         response = requests.get(url, allow_redirects=True)
@@ -57,10 +57,10 @@ def dl_tagger_model(model_dir):
 
 
 def dl_lora_model(model_dir):
-    file_name = 'lineart.safetensors'
+    file_name = 'normalmap.safetensors'
     file_path = os.path.join(model_dir, file_name)
     if not os.path.exists(file_path):
-        url = "https://huggingface.co/tori29umai/lineart/resolve/main/sdxl_BWLine.safetensors"
+        url = "https://huggingface.co/tori29umai/SDXL_shadow/resolve/main/sdxl-testlora-normalmap_04b_dim32.safetensorss"
         response = requests.get(url, allow_redirects=True)
         if response.status_code == 200:
             with open(file_path, 'wb') as f:

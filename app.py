@@ -7,7 +7,7 @@ import os
 import time
 
 from utils.dl_utils import dl_cn_model, dl_cn_config, dl_tagger_model, dl_lora_model
-from utils.image_utils import resize_image_aspect_ratio, base_generation, line_process
+from utils.image_utils import resize_image_aspect_ratio, base_generation
 
 from utils.prompt_utils import execute_prompt, remove_color, remove_duplicates
 from utils.tagger import modelLoad, analysis
@@ -27,12 +27,6 @@ dl_cn_config(cn_dir)
 dl_tagger_model(tagger_dir)
 dl_lora_model(lora_dir)
 
-def make_line(img_path, sigma, gamma):
-    sigma = float(sigma )
-    gamma = float(gamma)
-    return line_process(img_path, sigma, gamma)
-
-
 def load_model(lora_dir, cn_dir):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     dtype = torch.float16
@@ -42,8 +36,8 @@ def load_model(lora_dir, cn_dir):
     pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
         "cagliostrolab/animagine-xl-3.1", controlnet=controlnet, vae=vae, torch_dtype=torch.float16
     )
-    pipe.load_lora_weights(lora_dir, weight_name="lineart.safetensors")
-    pipe.set_adapters(["lineart"], adapter_weights=[1.4])
+    pipe.load_lora_weights(lora_dir, weight_name="normalmap.safetensors")
+    pipe.set_adapters(["normalmap"], adapter_weights=[1.4])
     pipe.fuse_lora()
     pipe = pipe.to(device)
     return pipe
@@ -52,13 +46,13 @@ def load_model(lora_dir, cn_dir):
 @spaces.GPU
 def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
     pipe = load_model(lora_dir, cn_dir) 
-    line_image =make_line(input_image_path, 1.4, 0.98)
-    base_size = line_image.size
-    resize_image = resize_image_aspect_ratio(line_image)
+    input_image = Image.open(input_image_path)
+    base_image = base_generation(input_image.size, (150, 110, 255, 255)).convert("RGB")
+    resize_image = resize_image_aspect_ratio(base_image)
     generator = torch.manual_seed(0)
     last_time = time.time()
-    prompt = "masterpiece, best quality, monochrome, lineart, white background, " + prompt
-    execute_tags = ["sketch", "transparent background"]
+    prompt = "masterpiece, best quality, normal map, purple background, " + prompt
+    execute_tags = ["monochrome", "greyscale", "lineart", "white background", "sketch", "transparent background"]
     prompt = execute_prompt(execute_tags, prompt)
     prompt = remove_duplicates(prompt)        
     prompt = remove_color(prompt)
@@ -76,7 +70,7 @@ def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
         eta=1.0,
     ).images[0]
     print(f"Time taken: {time.time() - last_time}")
-    output_image = output_image.resize(base_size, Image.LANCZOS)
+    output_image = output_image.resize(input_image.size, Image.LANCZOS)
     return output_image
 
 
