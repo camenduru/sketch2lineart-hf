@@ -28,15 +28,10 @@ load_lora_model(lora_dir)
 def load_model(lora_dir, cn_dir):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     dtype = torch.float16
-    model = "cagliostrolab/animagine-xl-3.1"
-    scheduler = AutoencoderKL.from_pretrained(model, subfolder="scheduler")
+    vae = AutoencoderKL.from_pretrained("madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16)
     controlnet = ControlNetModel.from_pretrained(cn_dir, torch_dtype=dtype, use_safetensors=True)
     pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
-        model,
-        controlnet=controlnet,
-        torch_dtype=dtype,
-        use_safetensors=True,
-        scheduler=scheduler,
+        "cagliostrolab/animagine-xl-3.1", controlnet=controlnet, vae=vae, torch_dtype=torch.float16
     )
     # pipe.load_lora_weights(lora_dir, weight_name="sdxl_BWLine.safetensors")
     pipe = pipe.to(device)
