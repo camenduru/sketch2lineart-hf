@@ -1,4 +1,3 @@
-import spaces
 import gradio as gr
 import torch
 from diffusers import ControlNetModel, StableDiffusionXLControlNetImg2ImgPipeline, ControlNetModel, AutoencoderKL
@@ -37,7 +36,6 @@ def load_model(lora_dir, cn_dir):
     pipe.load_lora_weights(lora_dir, weight_name="lineart.safetensors")
     return pipe
 
-@spaces.GPU(duration=120)
 def predict(input_image_path, prompt, negative_prompt, controlnet_scale):
     pipe = load_model(lora_dir, cn_dir) 
     input_image = Image.open(input_image_path)
